@@ -22,12 +22,23 @@ export class MembersService {
    this.accountService.currentUser$.pipe(take(1)).subscribe({
       next: user =>{
         if(user){
+          console.log(this.userParams)
           this.userParams = new UserParams(user)
           this.user = user
         }
       }
     })
+    // this.accountService.logoutEvent$.subscribe(() => {
+    //       this.clearCaches(); // Clear caches on logout
+    //   });
   }
+
+  // clearCaches() {
+  //   this.memberCache.clear();
+  //   this.userParams = undefined;
+  //   console.log(this.memberCache)
+  //   // You can add more cache clearing logic here if needed
+  // }
 
   getUserParams(){
     return this.userParams;
@@ -88,6 +99,18 @@ export class MembersService {
 
  deletePhoto(photoId: number){
    return this.http.delete(this.baseUrl + 'users/delete-photo/' + photoId);
+ }
+
+ addLike(username: string){
+  return this.http.post(this.baseUrl + 'likes/' + username,{})
+}
+
+ getLikes(predicate: string, pageNumber: number, pageSize: number){
+   let params = this.getPaginationHeaders(pageNumber, pageSize);
+
+   params = params.append('predicate', predicate);
+
+   return this.getPaginatedResult<Member[]>(this.baseUrl + 'likes', params);
  }
 
 private getPaginatedResult<T>(url: string, params: HttpParams) {

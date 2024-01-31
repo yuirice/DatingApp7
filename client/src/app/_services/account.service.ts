@@ -1,8 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, map } from 'rxjs';
 import { User } from '../_models/user';
 import { environment } from 'src/environments/environment';
+import { MembersService } from './members.service';
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +15,13 @@ export class AccountService {
   private currentUserSource = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSource.asObservable();
 
+  // private logoutEvent = new EventEmitter<void>();
+  // logoutEvent$ = this.logoutEvent.asObservable();
+
   constructor(private http: HttpClient) { }
 
   login(model: any) {
+    //localStorage.clear();
     return this.http.post<User>(this.baseUrl + 'account/login', model).pipe(
       map((response: User) => {
         const user = response;
@@ -26,6 +33,8 @@ export class AccountService {
   }
 
   register(model: any){
+
+
       return this.http.post<User>(this.baseUrl + 'account/register', model).pipe(
          map(user => {
            if(user){
@@ -41,7 +50,9 @@ export class AccountService {
   }
 
   logout() {
+    //localStorage.clear();
     localStorage.removeItem('user');
     this.currentUserSource.next(null);
+    // this.logoutEvent.emit(); // Emit the event
   }
 }
